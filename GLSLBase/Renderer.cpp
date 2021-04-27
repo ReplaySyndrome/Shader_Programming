@@ -58,9 +58,18 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Crete Test data
 
 	float tempVertics[] = { 0.f,0.f,0.f,1.f,0.f,0.f,1.f,1.f,0.f };
+
+	float tempVertics1[] = { 0.f,0.f,0.f,-1.f,0.f,0.f,-1.f,1.f,0.f };
+
+
 	glGenBuffers(1, &m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(tempVertics), tempVertics, GL_STATIC_DRAW);
+
+	
+	glGenBuffers(1, &m_VBO1);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO1);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(tempVertics1), tempVertics1, GL_STATIC_DRAW);
 
 }
 
@@ -307,14 +316,32 @@ void Renderer::Test()
 {
 	glUseProgram(m_SolidRectShader);
 
-	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	glEnableVertexAttribArray(attribPosition);
+	GLuint VBLocation = glGetAttribLocation(m_SolidRectShader, "a_Position");
 
 
+	//int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(VBLocation);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(VBLocation, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint VBLocation1 = glGetAttribLocation(m_SolidRectShader, "a_Position1");
+	glEnableVertexAttribArray(VBLocation1);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO1);
+	glVertexAttribPointer(VBLocation1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	static float gscale = 0.f;
+	GLuint ScaleUniform = glGetUniformLocation(m_SolidRectShader, "u_Scale");
+	glUniform1f(ScaleUniform, gscale);
 
 	glDrawArrays(GL_TRIANGLES, 0, 3); // StartRendering, primitive
 
-	glDisableVertexAttribArray(attribPosition);
+	gscale += 0.01f;
+	if (gscale > 1.f)
+	{
+		gscale = 0.f;
+	}
+
+	glDisableVertexAttribArray(VBLocation);
+	glDisableVertexAttribArray(VBLocation1);
+
 }
